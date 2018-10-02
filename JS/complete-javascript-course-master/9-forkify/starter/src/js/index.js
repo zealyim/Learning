@@ -1,6 +1,7 @@
 import Search from './models/Search';
 import Recipe from './models/Recipe';
 import * as searchView from './views/seachView';
+import * as recipeView from './views/recipeView'
 import { elements, renderLoader, clearLoader } from './views/base';
 
 /**Global State of the app
@@ -71,21 +72,24 @@ async function constrolRecipe(){
     console.log(id);
     if (id) {
         // Prepare UI for changes
-
+        renderLoader(elements.recipe)
         // Create new recipe object
         state.recipe = new Recipe(id);
-        window.r = state.recipe;
+        // window.r = state.recipe;
 
         try {
-            // Get recipe data
+            // Get recipe data & parse ingredent
             await state.recipe.getRecipe();
+            console.log(state.recipe.ingredent)
+            state.recipe.parseIngredients();
     
             // Calculate servings and time
             state.recipe.calcTime();
             state.recipe.calcServings();
     
             // Render recipe
-            console.log(state.recipe);
+            clearLoader();
+            recipeView.renderRecipe(state.recipe);
 
         } catch (error) {
             alert('Error getting recipe...');

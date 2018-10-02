@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {key} from '../config';
+import { parse } from 'url';
 
 export default class Recipe {
     constructor (id){
@@ -29,6 +30,7 @@ export default class Recipe {
     parseIngredients() {
         const unitsLong = ['tablespoons', 'tablespoon', 'ounces', 'ounce', 'teaspoons', 'teasoon', 'cups', 'pounds'];
         const unitsShort = ['tbsp', 'tbsp', 'oz', 'oz', 'tsp', 'tsp', 'cup', 'pound'];
+        console.log(this.ingredients);
         this.ingredients = this.ingredients.map(el => {
             // Uniform units
             let ingredient = el.toLowerCase();
@@ -41,10 +43,40 @@ export default class Recipe {
 
             // Parse ingredients into count, unit and ingreident
             const arrIng = ingredient.split(' ');
-            const unitIndex = arrIng.findIndex(el2 => unitsShort.includes(el2))
+            const unitIndex = arrIng.findIndex(el2 => unitsShort.includes(el2)); //findIndex return the index when the call back function return true
 
-            return ingredient;
-
+            let objIng;
+            if(unitIndex > -1) {  
+                //There is a unit
+                const arrCount = arrIng.slice(0, unitIndex);
+                let count;
+                if(arrCount.length === 1) {
+                    count = eval(arrCount[0].replace('-', '+'));
+                } else {
+                    count = eval(arrCount.join('+'));
+                }
+                objIng = {
+                    count,
+                    unit: arrIng[unitIndex],
+                    ingredient: arrIng.slice(unitIndex + 1).join(' ')
+                }
+            } 
+            else if (parseInt(arrIng[0], 10)) { 
+                // no unit but a quantity exist
+                objIng = {
+                    count: parseInt(arrIng[0], 10),
+                    unit: '',
+                    ingredient: arrIng.slice(1).join(' ')
+                }
+            } else if ( unitIndex === -1) {
+                //no unit and no quantity is found
+                objIng = {
+                    count: 1,
+                    unit: '',
+                    ingredient //ES6 allows to write this instead of ingredient: ingredient when the value name is same
+                }
+            }
+            return objIng;
         });
     }
 }
