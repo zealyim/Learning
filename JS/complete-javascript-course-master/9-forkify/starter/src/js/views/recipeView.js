@@ -13,7 +13,6 @@ const createIngredients = ingredient => `
 `;
 export const renderRecipe = recipe => {
     const markup = `
-    <!--
     <figure class="recipe__fig">
         <img src="${recipe.image}" alt="${recipe.title}" class="recipe__img">
         <h1 class="${recipe.title}">
@@ -60,7 +59,7 @@ export const renderRecipe = recipe => {
 
     <div class="recipe__ingredients">
         <ul class="recipe__ingredient-list">
-            ${recipe.ingredients.map(el => createIngredients).join('')}
+            ${recipe.ingredients.map(el => createIngredients(el)).join('')}
         </ul>
 
         <button class="btn-small recipe__btn">
@@ -85,7 +84,6 @@ export const renderRecipe = recipe => {
 
         </a>
     </div>
-    -->
     `;
     elements.recipe.insertAdjacentHTML('afterbegin', markup);
 }
