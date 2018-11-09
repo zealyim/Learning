@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {key} from '../config';
 import { parse } from 'url';
+import { timingSafeEqual } from 'crypto';
 
 export default class Recipe {
     constructor (id){
@@ -30,6 +31,7 @@ export default class Recipe {
     parseIngredients() {
         const unitsLong = ['tablespoons', 'tablespoon', 'ounces', 'ounce', 'teaspoons', 'teasoon', 'cups', 'pounds'];
         const unitsShort = ['tbsp', 'tbsp', 'oz', 'oz', 'tsp', 'tsp', 'cup', 'pound'];
+        const units = [...unitsShort, 'kg', 'g', ]
         console.log(this.ingredients);
         this.ingredients = this.ingredients.map(el => {
             // Uniform units
@@ -43,7 +45,7 @@ export default class Recipe {
 
             // Parse ingredients into count, unit and ingreident
             const arrIng = ingredient.split(' ');
-            const unitIndex = arrIng.findIndex(el2 => unitsShort.includes(el2)); //findIndex return the index when the call back function return true
+            const unitIndex = arrIng.findIndex(el2 => units.includes(el2)); //findIndex return the index when the call back function return true
 
             let objIng;
             if(unitIndex > -1) {  
@@ -78,5 +80,17 @@ export default class Recipe {
             }
             return objIng;
         });
+        //this.ingredients = newIngredients;
+    }
+    //type: increase or decrease
+    updateServings (type) {
+        //Servings
+        const newServings = type === 'decrease' ? this.servings - 1 : this.servings + 1
+        //Ingredients
+        this.ingredients.forEach(ing => {
+            ing.count *= newServings / this.servings;
+        })
+        this.servings = newServings;
+
     }
 }
